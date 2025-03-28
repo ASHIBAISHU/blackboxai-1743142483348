@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Lead Scoring Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Lead Form -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+        <h2 class="text-2xl font-bold mb-6 text-blue-800">Score a New Lead</h2>
+        <form id="leadForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 mb-2">Company Name</label>
+                    <input type="text" name="company_name" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2">Industry</label>
+                    <select name="industry" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                        <option value="logistics">Logistics</option>
+                        <option value="manufacturing">Manufacturing</option>
+                        <option value="retail">Retail</option>
+                        <option value="technology">Technology</option>
+                        <option value="finance">Finance</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 mb-2">Company Size</label>
+                    <input type="number" name="company_size" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2">Annual Revenue ($)</label>
+                    <input type="number" name="annual_revenue" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2">Employees</label>
+                    <input type="number" name="num_employees" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 mb-2">Lead Source</label>
+                <select name="lead_source" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                    <option value="web">Website</option>
+                    <option value="referral">Referral</option>
+                    <option value="trade_show">Trade Show</option>
+                    <option value="cold_call">Cold Call</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 mb-2">Past Interactions</label>
+                <input type="number" name="past_interactions" value="0" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 w-full">
+                Score Lead
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-2xl font-bold mb-6 text-blue-800">Prediction Results</h2>
+        <div id="resultsContainer" class="hidden">
+            <div class="text-center mb-6">
+                <div class="text-5xl font-bold text-blue-800 mb-2" id="scoreValue">0%</div>
+                <div class="text-gray-600">Conversion Probability</div>
+            </div>
+
+            <div class="mb-6">
+                <canvas id="scoreChart" height="200"></canvas>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2">Recommendation</h3>
+                <p id="recommendationText" class="text-gray-800"></p>
+            </div>
+
+            <div id="feedbackSection" class="border-t pt-4">
+                <h3 class="font-semibold mb-3">Feedback</h3>
+                <p class="text-sm text-gray-600 mb-3">How accurate is this prediction?</p>
+                <div class="flex space-x-2">
+                    <button class="feedback-btn bg-green-100 text-green-800 px-4 py-2 rounded-lg flex-1" data-feedback="accurate">
+                        <i class="fas fa-check-circle mr-2"></i> Accurate
+                    </button>
+                    <button class="feedback-btn bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg flex-1" data-feedback="somewhat">
+                        <i class="fas fa-question-circle mr-2"></i> Somewhat
+                    </button>
+                    <button class="feedback-btn bg-red-100 text-red-800 px-4 py-2 rounded-lg flex-1" data-feedback="inaccurate">
+                        <i class="fas fa-times-circle mr-2"></i> Inaccurate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="hidden text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-2 text-gray-600">Analyzing lead...</p>
+        </div>
+
+        <div id="emptyState" class="text-center py-8 text-gray-500">
+            <i class="fas fa-chart-line text-4xl mb-4"></i>
+            <p>Submit a lead to see prediction results</p>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Metrics Section -->
+<div class="mt-8 bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-6 text-blue-800">Model Performance</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-blue-50 p-4 rounded-lg">
+            <div class="text-blue-800 font-bold text-3xl mb-1" id="accuracyMetric">0%</div>
+            <div class="text-gray-600">Accuracy</div>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg">
+            <div class="text-green-800 font-bold text-3xl mb-1" id="precisionMetric">0%</div>
+            <div class="text-gray-600">Precision</div>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg">
+            <div class="text-purple-800 font-bold text-3xl mb-1" id="recallMetric">0%</div>
+            <div class="text-gray-600">Recall</div>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-lg">
+            <div class="text-yellow-800 font-bold text-3xl mb-1" id="f1Metric">0%</div>
+            <div class="text-gray-600">F1 Score</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize charts and form handling
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize empty chart
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        window.scoreChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Convert', 'Not Convert'],
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#3B82F6', '#E5E7EB'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Form submission handler
+        document.getElementById('leadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('resultsContainer').classList.add('hidden');
+            
+            // Process form data
+            const formData = new FormData(this);
+            const leadData = Object.fromEntries(formData.entries());
+            
+            try {
+                // Send to API
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(leadData)
+                });
+                
+                const result = await response.json();
+                
+                // Update UI with results
+                updateResultsUI(result);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing lead');
+            } finally {
+                document.getElementById('loadingIndicator').classList.add('hidden');
+            }
+        });
+        
+        function updateResultsUI(result) {
+            // Update score display
+            const scorePercent = Math.round(result.score * 100);
+            document.getElementById('scoreValue').textContent = `${scorePercent}%`;
+            
+            // Update chart
+            window.scoreChart.data.datasets[0].data = [scorePercent, 100 - scorePercent];
+            window.scoreChart.update();
+            
+            // Update recommendation
+            const recommendationText = document.getElementById('recommendationText');
+            if (result.score > 0.7) {
+                recommendationText.textContent = 'High priority lead - recommend immediate follow-up';
+                recommendationText.className = 'text-green-600 font-medium';
+            } else if (result.score > 0.4) {
+                recommendationText.textContent = 'Medium priority lead - schedule follow-up';
+                recommendationText.className = 'text-yellow-600 font-medium';
+            } else {
+                recommendationText.textContent = 'Low priority lead - follow up if time permits';
+                recommendationText.className = 'text-red-600 font-medium';
+            }
+            
+            // Show results
+            document.getElementById('resultsContainer').classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}
