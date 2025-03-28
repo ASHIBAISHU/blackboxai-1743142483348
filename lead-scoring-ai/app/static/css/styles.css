@@ -1,0 +1,214 @@
+/* Custom styles to complement Tailwind */
+
+/* Voice Feedback Modal */
+#voiceModal {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#voiceModal > div {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+}
+
+#voiceModal h3 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+#voiceStatus {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Voice Control Buttons */
+#startRecording, #playRecording {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+#startRecording {
+    background: #ff5e62;
+    color: white;
+}
+
+#startRecording:hover {
+    background: #ff4448;
+    transform: scale(1.05);
+}
+
+#playRecording {
+    background: #4facfe;
+    color: white;
+}
+
+#playRecording:hover {
+    background: #3a9bfe;
+    transform: scale(1.05);
+}
+
+#playRecording:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Action Buttons */
+#cancelVoice, #submitVoice {
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#cancelVoice {
+    background: white;
+    border: 1px solid #ddd;
+    color: #666;
+}
+
+#cancelVoice:hover {
+    background: #f8f9fa;
+}
+
+#submitVoice {
+    background: #4facfe;
+    color: white;
+    border: none;
+    margin-left: 1rem;
+}
+
+#submitVoice:hover {
+    background: #3a9bfe;
+}
+
+/* Voice Feedback Button */
+.voice-feedback-btn {
+    background: #4facfe;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.voice-feedback-btn:hover {
+    background: #3a9bfe;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Animation for Recording */
+@keyframes recording-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 94, 98, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 94, 98, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 94, 98, 0); }
+}
+
+.recording {
+    animation: recording-pulse 1.5s infinite;
+}
+
+/* Animation for score display */
+@keyframes score-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Voice control active state */
+.voice-active {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Table row hover effect */
+.table-hover tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Form input focus styles */
+.input-focus:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+}
+
+/* Loading spinner */
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Feedback buttons */
+.feedback-btn {
+    transition: all 0.2s ease;
+}
+
+.feedback-btn:hover {
+    transform: translateY(-2px);
+}
+
+.feedback-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .mobile-stack {
+        flex-direction: column;
+    }
+    
+    .mobile-stack > * {
+        margin-bottom: 1rem;
+    }
+    
+    .mobile-stack > *:last-child {
+        margin-bottom: 0;
+    }
+}
